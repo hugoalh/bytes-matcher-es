@@ -42,20 +42,44 @@
 	"lock": false,
 	"tasks": {
 		"jsr-check": {
-			"command": "deno publish --allow-dirty --config jsr.jsonc --dry-run --no-provenance",
-			"description": "Check deployment for JSR."
+			"command": "deno publish --allow-dirty --config $(deno task jsr-var-manifest-relative) --dry-run --no-provenance",
+			"description": "Check package for JSR."
 		},
 		"jsr-publish": {
-			"command": "deno publish --allow-dirty --config jsr.jsonc --no-provenance",
+			"command": "deno publish --allow-dirty --config $(deno task jsr-var-manifest-relative)",
 			"description": "Publish package to JSR."
 		},
-		"jsr-publish-provenance": {
-			"command": "deno publish --allow-dirty --config jsr.jsonc",
-			"description": "Publish package to JSR (provenance)."
+		"jsr-var-manifest-relative": {
+			"command": "echo \"jsr.jsonc\"",
+			"description": "Variable of the JSR manifest file relative path."
 		},
 		"npm-build": {
 			"command": "deno run --allow-all --no-prompt --quiet .dnt.ts",
 			"description": "Build package for NPM."
+		},
+		"npm-check": {
+			"command": "deno task --cwd $(deno task npm-var-distribution-absolute) --eval $(deno task npm-check-command)",
+			"description": "Check package for NPM."
+		},
+		"npm-check-command": {
+			"command": "echo \"npm publish --dry-run\"",
+			"description": "Get command for check package for NPM."
+		},
+		"npm-publish": {
+			"command": "deno task --cwd $(deno task npm-var-distribution-absolute) --eval $(deno task npm-publish-command)",
+			"description": "Publish package to NPM."
+		},
+		"npm-publish-command": {
+			"command": "echo \"npm publish --tag publish\"",
+			"description": "Get command for publish package to NPM."
+		},
+		"npm-var-distribution-absolute": {
+			"command": "deno eval --no-config --no-lock --no-npm --no-remote \"import { join as joinPath } from \\\"node:path\\\"; console.log(joinPath(Deno.env.get(\\\"INIT_CWD\\\"), \\\"$(deno task npm-var-distribution-relative)\\\"));\"",
+			"description": "Variable of the NPM distribution directory absolute path."
+		},
+		"npm-var-distribution-relative": {
+			"command": "echo \"dist/npm\"",
+			"description": "Variable of the NPM distribution directory relative path."
 		}
 	},
 	"unstable": [
